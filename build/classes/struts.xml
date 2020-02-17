@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+	
+	<!-- 设置上传文件的总大小，默认是2M -->
+	<constant name="struts.multipart.maxSize" value="209715200"/>
+
+	<package name="wrc" namespace="/" extends="struts-default">
+	
+		<!-- 配置拦截器 -->
+		<interceptors>
+			<!-- 一级拦截器，主要拦截未登陆用户，但‘登录’和‘Qt保存’不拦截 -->
+			<interceptor name="UserInterceptor" class="cn.edu.shu.web.interceptor.UserInterceptor">
+				<param name="excludeMethods">login,save,saveForDiagnosis</param>
+			</interceptor>
+			<!-- 二级拦截器，主要拦截未激活用户 -->
+			<interceptor name="userActivateInterceptor" class="cn.edu.shu.web.interceptor.UserActivateInterceptor">
+				<param name="includeMethods">init*,del*</param>
+			</interceptor>
+			<!-- 三级拦截器1，主要拦截非管理员用户，在dict中引入 -->
+			<interceptor name="userAdminInterceptor" class="cn.edu.shu.web.interceptor.UserAdminInterceptor">
+				<param name="excludeMethods">findByCodeByAjax,devicePercent</param>
+			</interceptor>
+			<!-- 三级拦截器2，主要拦截非管理员用户，在User中引入 -->
+			<interceptor name="userAdminInterceptor2" class="cn.edu.shu.web.interceptor.UserAdminInterceptor">
+				<param name="includeMethods">findByPage,freezeAccount,activateAccount,deleteUser</param>
+			</interceptor>
+			
+			<interceptor-stack name="myStack">
+				<interceptor-ref name="UserInterceptor"/>
+				<interceptor-ref name="userActivateInterceptor"></interceptor-ref>
+				<interceptor-ref name="defaultStack"/>
+			</interceptor-stack>
+			<interceptor-stack name="adminStack">
+				<interceptor-ref name="userAdminInterceptor"/>
+				<interceptor-ref name="defaultStack"/>
+			</interceptor-stack>
+			<interceptor-stack name="adminStack2">
+				<interceptor-ref name="userAdminInterceptor2"/>
+				<interceptor-ref name="defaultStack"/>
+			</interceptor-stack>
+		</interceptors>
+		
+		<!-- 配置全局结果页面 -->
+		<global-results>
+			<result name="login" type="redirect">/login.jsp</result>
+		</global-results>
+		
+		<!-- 配置patient的Action，如果Action由Spring框架来管理，class上只需填写ID值即可 -->
+		<action name="patient_*" class="patientAction" method="{1}">
+			<!-- 被试信息保存成功，上传记录信息 -->
+			<result name="toRecordInfo" type="redirect">/jsp/recordInfo.jsp</result>
+			<!-- 被试信息保存成功，上传评估信息 -->
+			<result name="toDiagnosisInfo" type="redirect">/jsp/diagnosisInfo.jsp</result>
+			<!-- 跳转到添加页面 -->
+			<result name="initAddUI" type="redirect">/jsp/patient/add.jsp</result>
+			<!-- 跳转到详情页面 -->
+			<result name="initDetail">/jsp/patient/detail.jsp</result>
+			<!-- 跳转到更新页面 -->
+			<result name="initUpdate">/jsp/patient/edit.jsp</result>
+			<!-- 分页查询结果 -->
+			<result name="page">/jsp/patient/list.jsp</result>   
+			<!-- Qt上传信息出错 -->                
+			<result name="error" type="redirect">/jsp/errorInfo.jsp</result>
+			<!-- PRM添加信息出错 用户信息不完整-->
+			<result name="errorFromPRM">/jsp/errorFromPRM.jsp</result>
+			<!-- PRM添加信息成功，跳转至查询列表 -->
+			<result name="toList" type="redirectAction">patient_findByPage.action</result>
+			<!-- 被试信息跟新成功跳转至查询列表 -->
+			<result name="update" type="redirectAction">patient_findByPage.action</result>
+			<!-- 被试信息删除成功跳转至查询列表 -->
+			<result name="delete" type="redirectAction">patient_findByPage.action</result>
+			<!-- PRM添加的用户已存在 -->
+			<result name="alreadyexist">/jsp/errorFromPRM.jsp</result>
+			<!-- 权限不足 -->
+			<result name="InsufficientPermissions">/jsp/InsufficientPermissions.jsp</result>
+			
+			<!-- 引入拦截器 -->
+			<interceptor-ref name="myStack"/>
+		</action>
+		
+		<!-- 配置record的Action -->
+		<action name="record_*" class="recordAction" method="{1}">
+			<result name="tosuccess">/jsp/success.jsp</result>
+			<result name="page">/jsp/record/list.jsp</result>
+			<result name="downloadPage">/jsp/record/downloadList.jsp</result>
+			<result name="downloadPageOnline">/jsp/record/downloadListOnline.jsp</result>
+			<result name="initDetail">/jsp/record/detail.jsp</result>
+			<result name="initUpdate">/jsp/record/edit.jsp</result>
+			<result name="initAddUI">/jsp/record/add.jsp</result>
+			<result name="recordPercent">/jsp/record/recordPercent.jsp</result>
+			<result name="resultChartTrend">/jsp/record/resultChartTrend.jsp</result>
+			<result name="resultChartTrendWrong" type="redirectAction">record_resultChartUI.action</result>
+			<result name="recordRanking">/jsp/record/recordRanking.jsp</result>
+			<result name="addsuccess" type="redirectAction">record_findByPage.action</result>
+			<result name="addFail">/jsp/errorFromPRM.jsp</result>
+			<result name="rankingFail">/jsp/errorFromPRM.jsp</result>
+			<!-- 权限不足 -->
+			<result name="InsufficientPermissions">/jsp/InsufficientPermissions.jsp</result>
+			<!-- 试验记录跟新成功跳转至查询列表 -->
+			<result name="update" type="redirectAction">record_findByPage.action</result>
+			<!-- 试验记录被删除跳转到查询列表 -->
+			<result name="delete" type="redirectAction">record_findByPage.action</result>
+			<result name="success" type="stream">
+				<param name="contentType">${contentType}</param>
+				<param name="inputName">inputStream</param>
+				<param name="contentDisposition">attachment;filename=${filename}</param>
+				<param name="bufferSize">4096</param>
+			</result>
+			
+			<!-- 引入拦截器 -->
+			<interceptor-ref name="myStack"/>
+		</action>
+		
+		<!-- 配置dict的Action -->
+		<action name="dict_*" class="dictAction" method="{1}">
+			<result name="pageDevice">/jsp/dict/listDevice.jsp</result>
+			<result name="pageProfile">/jsp/dict/listProfile.jsp</result>
+			<result name="NonAdmin">/jsp/NonAdmin.jsp</result>
+			<result name="editDevice">/jsp/dict/editDevice.jsp</result>
+			<result name="editProfile">/jsp/dict/editProfile.jsp</result>
+			<result name="updateDeviceOk" type="redirectAction">dict_findDeviceByPage</result>
+			<result name="updateProfileOk" type="redirectAction">dict_findProfileByPage</result>
+			<result name="addNewDeviceUI">/jsp/dict/addNewDevice.jsp</result>
+			<result name="addNewProfileUI">/jsp/dict/addNewProfile.jsp</result>
+			<result name="saveDeviceOk" type="redirectAction">dict_findDeviceByPage</result>
+			<result name="saveProfileOk" type="redirectAction">dict_findProfileByPage</result>
+			<result name="devicePercent">/jsp/dict/devicePercent.jsp</result>
+		
+			<interceptor-ref name="adminStack"/>
+		</action>
+		
+		<!-- 配置user的Action -->
+		<action name="user_*" class="userAction" method="{1}">
+			<result name="loginOK" type="redirect">/index.jsp</result>
+			<result name="center" type="redirect">jsp/user/center.jsp</result>
+			<result name="alterInfoUI" type="redirect">jsp/user/alterInfo.jsp</result>
+			<result name="alterInfoOK" type="redirect">jsp/user/center.jsp</result>
+			
+			<result name="alterCodeUI" type="redirect">jsp/user/alterCode.jsp</result>
+			<result name="oldPasswordError">jsp/user/alterCode.jsp</result>
+			
+			<result name="register" type="redirect">/regist.jsp</result>
+			<result name="loginError">/login.jsp</result>
+			<!-- 分页查询结果 -->
+			<result name="page">/jsp/user/list.jsp</result>  
+			<!-- 冻结账户跳转至分页查询 -->
+			<result name="freeze" type="redirectAction">user_findByPage.action</result>  
+			<!-- 激活账户跳转至分页查询 -->
+			<result name="activate" type="redirectAction">user_findByPage.action</result>  
+			<!-- 删除账户跳转至分页查询 -->
+			<result name="deleteOk" type="redirectAction">user_findByPage.action</result>
+			<result name="NonAdmin">/jsp/NonAdmin.jsp</result> 
+			
+			<interceptor-ref name="adminStack2"/> 
+		</action>
+		
+		<!-- 配置action的Action -->
+		<action name="action_*" class="actionAction" method="{1}">
+			<!-- 分页查询结果 -->
+			<result name="page">/jsp/action/list.jsp</result>  
+			<!-- 跳转到详情页面 -->
+			<result name="initDetail">/jsp/action/detail.jsp</result>
+			<!-- 跳转到更新页面 -->
+			<result name="initEdit">/jsp/action/edit.jsp</result>
+			<!-- 评估动作更新成功跳转至查询列表 -->
+			<result name="update" type="redirectAction">action_findByPage.action</result>
+			<result name="addNewActionUI">/jsp/action/addNewAction.jsp</result>
+			<result name="saveActionOk" type="redirectAction">action_findByPage</result>
+			<result name="delete" type="redirectAction">action_findByPage.action</result>
+			
+			<result name="NonAdmin">/jsp/NonAdmin.jsp</result> 
+			
+			<interceptor-ref name="adminStack2"/> 
+		</action>
+		
+		<!-- 配置diagnosis的Action -->
+		<action name="diagnosis_*" class="diagnosisAction" method="{1}">
+			<result name="tosuccess">/jsp/success.jsp</result>
+			<!-- 分页查询结果 -->
+			<result name="page">/jsp/diagnosis/list.jsp</result>  
+			<!-- 跳转到详情页面 -->
+			<result name="initDetail">/jsp/diagnosis/detail.jsp</result>
+			<!-- 跳转到更新页面 -->
+			<result name="initEdit">/jsp/diagnosis/edit.jsp</result>
+			<!-- 评估动作更新成功跳转至查询列表 -->
+			<result name="update" type="redirectAction">diagnosis_findByPage.action</result>
+			<result name="initAddUI">/jsp/diagnosis/add.jsp</result>
+			<result name="addsuccess" type="redirectAction">diagnosis_findByPage.action</result>
+			<result name="addFail">/jsp/errorFromPRM.jsp</result>
+			<!-- 权限不足 -->
+			<result name="InsufficientPermissions">/jsp/InsufficientPermissions.jsp</result>
+			<!-- 试验记录被删除跳转到查询列表 -->
+			<result name="delete" type="redirectAction">diagnosis_findByPage.action</result>
+			<result name="diagnosisChartTrend">/jsp/diagnosis/diagnosisChartTrend.jsp</result>
+			
+			<result name="NonAdmin">/jsp/NonAdmin.jsp</result> 
+			
+			<interceptor-ref name="myStack"/> 
+		</action>
+		
+		<!-- 配置accept的Action -->
+		<action name="acceptParams_*" class="acceptParamsAction" method="{1}">
+			<!-- 重定向到patientInfo.jsp -->
+			<result name="accept" type="redirect">/jsp/InfoIndex.jsp</result>
+			<result name="acceptDiagnosis" type="redirect">/jsp/InfoIndexDiagnosis.jsp</result>
+		</action>
+		
+	</package>
+
+</struts>
+
+
+
+
+
+
+
+
+
+
+
+
+

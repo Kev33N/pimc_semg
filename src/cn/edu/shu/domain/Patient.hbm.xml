@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+    
+<hibernate-mapping>
+	
+	<class name="cn.edu.shu.domain.Patient" table="patient">
+		<id name="patient_id" column="patient_id">
+			<generator class="native"/>
+		</id>
+		
+		<property name="patient_code" column="patient_code"/>
+		<property name="patient_name" column="patient_name"/>
+		<property name="patient_gender" column="patient_gender"/>
+		<property name="patient_age" column="patient_age"/>
+		<property name="patient_birthday" column="patient_birthday"/>
+		<property name="patient_phone" column="patient_phone"/>
+		<property name="patient_email" column="patient_email"/>
+		<property name="patient_address" column="patient_address"/>
+		<property name="patient_additional" column="patient_additional"/>
+		
+		<!-- 让patient放弃外键维护的权力 -->
+		<set name="records" inverse="true">
+			<key column="record_patient_id"/>
+			<one-to-many class="cn.edu.shu.domain.Record"/>
+		</set>
+		<set name="diagnosis" inverse="true">
+			<key column="diagnosis_patient"/>
+			<one-to-many class="cn.edu.shu.domain.Diagnosis"/>
+		</set>
+		
+	</class>
+	
+</hibernate-mapping>    

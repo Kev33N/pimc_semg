@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="cn.edu.shu.domain.Dict" table="base_dict">
+		<id name="dict_id" column="dict_id">
+			<generator class="uuid" />
+		</id>
+
+		<property name="dict_type_code" column="dict_type_code" />
+		<property name="dict_type_name" column="dict_type_name" />
+		<property name="dict_item_name" column="dict_item_name" />
+		<property name="dict_item_type" column="dict_item_type" />
+		<property name="dict_item_number" column="dict_item_number" />
+		<property name="dict_item_samplefrequency" column="dict_item_samplefrequency" />
+		<property name="dict_item_country" column="dict_item_country" />
+		<property name="dict_item_additional" column="dict_item_additional" />
+		
+		
+	</class>
+
+</hibernate-mapping>    

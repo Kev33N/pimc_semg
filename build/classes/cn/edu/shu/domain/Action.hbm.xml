@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+    
+<hibernate-mapping>
+	
+	<class name="cn.edu.shu.domain.Action" table="action">
+		<id name="action_id" column="action_id">
+			<generator class="native"/>
+		</id>
+		
+		<property name="action_name" column="action_name"/>
+		<property name="action_muscle" column="action_muscle"/>
+		<property name="action_type" column="action_type"/>
+		<property name="action_additional" column="action_additional"/>
+		
+	</class>
+	
+</hibernate-mapping>    

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+    
+<hibernate-mapping>
+	
+	<class name="cn.edu.shu.domain.Diagnosis" table="diagnosis">
+		<id name="diagnosis_id" column="diagnosis_id">
+			<generator class="native"/>
+		</id>
+		<!-- 诊断依据的特征值 -->
+		<property name="diagnosis_iEMG" column="diagnosis_iEMG"/>
+		<property name="diagnosis_RMS" column="diagnosis_RMS"/>
+		<property name="diagnosis_MPF" column="diagnosis_MPF"/>
+		<property name="diagnosis_MF" column="diagnosis_MF"/>
+		<!-- 诊断日期 -->
+		<property name="diagnosis_date" column="diagnosis_date"/>
+		
+		
+		
+		<!-- 配置多方,name式JavaBean属性名称，class是一方的全路径，column是外键的名称 -->
+		<many-to-one name="patient" class="cn.edu.shu.domain.Patient" column="diagnosis_patient"/>
+		<many-to-one name="action" class="cn.edu.shu.domain.Action" column="diagnosis_action"/>
+		<many-to-one name="device" class="cn.edu.shu.domain.Dict" column="diagnosis_device"/>
+		<many-to-one name="profile" class="cn.edu.shu.domain.Dict" column="diagnosis_profile"/>
+		
+	</class>
+	
+</hibernate-mapping>    

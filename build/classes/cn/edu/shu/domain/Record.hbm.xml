@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+    
+<hibernate-mapping>
+	
+	<class name="cn.edu.shu.domain.Record" table="record">
+		<id name="record_id" column="record_id">
+			<generator class="native"/>
+		</id>
+		
+		<property name="record_date" column="record_date"/>
+		<property name="record_duration" column="record_duration"/>
+		<!-- 上传文件保存的路径 -->
+		<property name="record_filepath" column="record_filepath"/>
+		<property name="record_labelpath" column="record_labelpath"/>
+		
+		<property name="record_score" column="record_score"/>
+		
+		
+		<!-- 配置多方,name式JavaBean属性名称，class是一方的全路径，column是外键的名称 -->
+		<many-to-one name="patient" class="cn.edu.shu.domain.Patient" column="record_patient_id"/>
+		<many-to-one name="device" class="cn.edu.shu.domain.Dict" column="record_device"/>
+		<many-to-one name="profile" class="cn.edu.shu.domain.Dict" column="record_profile"/>
+		
+	</class>
+	
+</hibernate-mapping>    
