@@ -18,7 +18,7 @@
 		<property name="driverClass" value="com.mysql.jdbc.Driver"/>
 		<property name="jdbcUrl" value="jdbc:mysql:///pimc_semg"/>
 		<property name="user" value="root"/>
-		<property name="password" value="0208055201314s"/>
+		<property name="password" value="xxx"/>
 	</bean>
 	
 	<!-- LocalSessionFactoryBean加载配置文件 -->
